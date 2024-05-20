@@ -1,0 +1,24 @@
+from pathlib import Path
+import logging
+from src.configs.config_base import ConfigBase
+
+'''
+Create program's directory structure.
+'''
+
+class PathConfig(ConfigBase):
+    root = Path(__file__).resolve().parents[1]
+    src = root / 'src'
+    data = root / 'data'
+    scripts = root / 'scripts'
+    tests = root / 'test'
+    logs = data / 'logs'
+
+    def __post__init__(self) -> None:
+        # create directories
+        for path in vars(self).values():
+            path.mkdir(parents = True, exist_ok = True)
+    
+class LoggerConfig(ConfigBase):
+    level = logging.INFO
+    logs_dir = PathConfig().logs
