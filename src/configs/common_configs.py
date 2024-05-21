@@ -7,7 +7,7 @@ Create program's directory structure.
 '''
 
 class PathConfig(ConfigBase):
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[2]
     src = root / 'src'
     data = root / 'data'
     scripts = root / 'scripts'
