@@ -1,4 +1,4 @@
-# DominationInGraphs
+# Domination In Graphs
 
 Domination problem is a crucial question in graph theory.
 
