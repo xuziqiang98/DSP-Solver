@@ -2,10 +2,6 @@ from pathlib import Path
 import logging
 from src.configs.config_base import ConfigBase
 
-'''
-Create program's directory structure.
-'''
-
 class PathConfig(ConfigBase):
     root = Path(__file__).resolve().parents[2]
     src = root / 'src'
