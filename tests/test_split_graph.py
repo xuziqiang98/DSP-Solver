@@ -6,7 +6,7 @@ from src.configs.common_configs import PathConfig
 
 def test_split_graph():
     path = PathConfig.data / 'split_graphs.csv'
-    split_graph = SplitGraph('SplitGraph', 10)
+    split_graph = SplitGraph('SplitGraph', 20)
     split_graph.save2file(path)
     # adj = np.loadtxt(path, delimiter=',', dtype=int)
     adj = SplitGraph.file2adj(path)

@@ -52,11 +52,6 @@ class SplitGraph(Graph):
     def save2file(self, path) -> None:
         adj = self._adj
         np.savetxt(path, adj, delimiter=',', fmt='%d')
-
-    # read the adjacency matrix of the split graph from a .csv file
-    def file2adj(path) -> np.ndarray:
-        adj = np.loadtxt(path, delimiter=',', dtype=int)
-        return adj
     
     def __repr__(self) -> str:
         return f'SplitGraph({self.num_vertices})'

@@ -22,9 +22,10 @@ class Graph(abc.ABC):
     def save2file(self, path) -> None:
         pass
     
-    @abc.abstractmethod
+    # read the adjacency matrix of the graph from a .csv file
     def file2adj(path) -> np.ndarray:
-        pass
+        adj = np.loadtxt(path, delimiter=',', dtype=int)
+        return adj
 
     @abc.abstractmethod
     def __repr__(self) -> str:
