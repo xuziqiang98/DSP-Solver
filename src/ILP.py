@@ -7,12 +7,13 @@ class ILP(Algorithm):
     def __init__(self, path) -> None:
         self._name = "Gurobi"
         self._model = gp.read(path)
+        # self._model = env.read(lp_path) if env else read(lp_path)
 
     def optimize(self) -> None:
         self._model.optimize()
 
-    def getValues(self) -> float:
-        return self._model.getObjective().getValue()
+    def getValues(self) -> int:
+        return int(self._model.getObjective().getValue())
     
     def saveResults(self, path: str) -> None:
         self._model.write(path)

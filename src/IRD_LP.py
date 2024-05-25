@@ -1,11 +1,16 @@
 import scripts.path_setup
+import numpy as np
 
 from .LP import LP
 
 class IRD_LP(LP):
 
+    def __init__(self, adj_path, lp_path):
+        self.adj = np.loadtxt(adj_path, delimiter=',')  # read the adj_path as a 2D array
+        self.lp_path = lp_path
+
     def generate_lp(self) -> None:
-        with open(self.path, 'w') as f:
+        with open(self.lp_path, 'w') as f:
             # goal
             f.write('Minimize\n')
             # sum_{i=0}^{n-1}(1 x(i, 1) + 2 x(i, 2))
