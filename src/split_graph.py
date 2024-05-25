@@ -31,12 +31,25 @@ class SplitGraph(Graph):
             for j in range(i+1, self.num_vertices):
                 adj[i][j] = 0
                 adj[j][i] = 0
-        # the edges between the clique and the independent set are random
-        # but vertex in the independent set is at least connected to one vertex in the clique
+        # the edges between the clique and the independent set are randomly connected
+        # but each vertex in the independent set is at least connected to one vertex in the clique
         for i in range(self._clique, self.num_vertices):
-            random_vertex = random.randint(0, self._clique-1)
-            adj[i][random_vertex] = 1
-            adj[random_vertex][i] = 1
+            for j in range(self._clique):
+                adj[i][j] = random.randint(0, 1)
+                adj[j][i] = adj[i][j]
+            # if the vertex in the independent set is not connected to any vertex in the clique
+            # then it is connected to a random vertex in the clique
+            if sum(adj[i][:self._clique]) == 0:
+                j = random.randint(0, self._clique-1)
+                adj[i][j] = 1
+                adj[j][i] = 1
+            # if the vertex in the independent set is connected to all vertices in the clique
+            # then it is not connected to a random vertex in the clique
+            if self._clique is not 1:
+                while sum(adj[i][:self._clique]) == self._clique:
+                    j = random.randint(0, self._clique-1)
+                    adj[i][j] = 0
+                    adj[j][i] = 0
         return np.array(adj)
     
     def get_adj(self) -> np.ndarray:
@@ -45,6 +58,10 @@ class SplitGraph(Graph):
     def get_clique(self) -> int:
         return self._clique
     
+    # return the maximum degree of the split graph
+    def get_max_degree(self) -> int:
+        return max([sum(self._adj[i]) for i in range(self.num_vertices)])
+    
     def get_independent_set(self) -> int:  
         return self._independent_set
     
@@ -52,9 +69,10 @@ class SplitGraph(Graph):
     def save2file(self, path) -> None:
         adj = self._adj
         np.savetxt(path, adj, delimiter=',', fmt='%d')
-    
-    def __repr__(self) -> str:
-        return f'SplitGraph({self.num_vertices})'
 
+    def __repr__(self) -> str:
+        return (f'SplitGraph({self.graph_type}, {self.num_vertices})')
+    
     def __str__(self) -> str:
-        return f'SplitGraph: {self.num_vertices} vertices'
+        return (f'SplitGraph({self.graph_type}, {self.num_vertices}): '
+                f'clique = {self._clique}, independent set = {self._independent_set}')

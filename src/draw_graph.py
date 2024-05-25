@@ -14,3 +14,11 @@ class DrawGraph:
         G = nx.from_numpy_array(self.adj)
         nx.draw(G, with_labels=True)
         plt.show()
+
+    # draw the split graph
+    # k is the number of vertices in the clique
+    def draw_split(self, k) -> None:
+        G = nx.from_numpy_array(self.adj)
+        colors = ['red'] * k + ['blue'] * (len(G.nodes) - k)
+        nx.draw(G, with_labels=True, node_color=colors)
+        plt.show()

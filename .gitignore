@@ -166,3 +166,7 @@ cython_debug/
 
 # .lp files
 *.lp
+
+# .txt files except for requirements.txt
+*.txt
+!requirements.txt
