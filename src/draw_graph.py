@@ -3,7 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .split_graph import SplitGraph
+from graph import SplitGraph
 
 class DrawGraph:
     def __init__(self, adj) -> None:
