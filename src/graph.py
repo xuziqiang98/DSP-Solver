@@ -1,111 +1,225 @@
 import scripts.path_setup
 import abc
-import numpy as np
 import random
 
+import numpy as np
+import networkx as nx
+
 from typing import List
+from abc import ABC, abstractmethod
+from src.utils import GraphType
+from math import ceil, floor
+from random import randint
 
-class Graph(abc.ABC):
+class GraphFactory:
     
-    def __init__(self, graph_type, num_vertices) -> None:
-        self.graph_type = graph_type
-        self.num_vertices = num_vertices
+    def get(self, type, n_vertices: int, *args) -> 'GraphBase':
+        if type == GraphType.RANDOM:
+            return RandomGraph(n_vertices, *args)
+        elif type == GraphType.SPLIT:
+            return SplitGraph(n_vertices, *args)
+        elif type == GraphType.ER:
+            return ErdosRenyiGraph(n_vertices, *args)
+        elif type == GraphType.BA:
+            return BarabasiAlbertGraph(n_vertices, *args)
+        elif type == GraphType.REGULAR:
+            return RegularGraph(n_vertices, *args)
+        elif type == GraphType.WS:
+            return WattsStrogatzGraph(n_vertices, *args)
+        else:
+            raise NotImplementedError()
 
-    @abc.abstractmethod
-    def graph2adj(self) -> np.ndarray:
-        pass
+class GraphBase(ABC):
 
-    @abc.abstractmethod
-    def get_adj(self) -> np.ndarray:
-        pass
+    def __init__(self, n_vertices) -> None:
+        self.n_vertices = n_vertices
 
-    @abc.abstractmethod
-    def save2file(self, path) -> None:
-        pass
+    @abstractmethod
+    def get(self) -> np.ndarray:
+        raise NotImplementedError
+
+class RandomGraph(GraphBase):
+    '''
+    Attributes:
+        self.get_w (lambda): get the weight of the edge
+    '''
+    def __init__(self, n_vertices) -> None:
+        '''
+        Attributes:
+            n_vertices (int): number of vertices
+        '''
+        super().__init__(n_vertices)
+        
+        self.get_w = lambda : np.random.choice([0, 1])
+
+    def get(self) -> np.ndarray:
+        '''
+        Attributes:
+            n (int): number of vertices
+            density (float): edge density
+            
+        Returns:
+            matrix (np.ndarray): adjacency matrix
+        '''
+        n = self.n_vertices
+        density = np.random.uniform()
+        matrix = np.zeros((n, n))
+        for i in range(n):
+            for j in range(i):
+                if np.random.uniform() < density:
+                    w = self.get_w()
+                    matrix[i, j] = w
+                    matrix[j, i] = w
+
+        return matrix
+
+class ErdosRenyiGraph(GraphBase):
+
+    def __init__(self, n_vertices=20, p_connection=[0.1,0]):
+        '''
+        Args:
+            n_vertices (int): number of vertices
+            p_connection (list): mean and standard deviation of the edge probability
+            
+        Attributes:
+            self.get_connection_mask (lambda): get the connection mask
+        '''    
+        super().__init__(n_vertices)
+
+        if type(p_connection) not in [list,tuple]:
+            p_connection = [p_connection, 0]
+        assert len(p_connection)==2, "p_connection must have length 2"
+        self.p_connection  = p_connection
+
+        # def get_connection_mask():
+        #     mask = 1. * np.random.randint(2, size=(self.n_vertices, self.n_vertices))
+        #     mask = np.tril(mask) + np.triu(mask.T, 1)
+        #     return mask
+        
+        # self.get_connection_mask = get_connection_mask
+
+    def get(self) -> np.ndarray:
+
+        p = np.clip(np.random.normal(*self.p_connection),0,1)
+
+        g = nx.erdos_renyi_graph(self.n_vertices, p)
+        # adj = np.multiply(nx.to_numpy_array(g), self.get_connection_mask())
+
+        # No self-connections (this modifies adj in-place).
+        # np.fill_diagonal(adj, 0)
+
+        return nx.to_numpy_array(g)
+
+class BarabasiAlbertGraph(GraphBase):
+
+    def __init__(self, n_vertices=20, m_insertion_edges=4) -> np.ndarray:
+        super().__init__(n_vertices)
+
+        self.m_insertion_edges = m_insertion_edges
+
+        # def get_connection_mask():
+        #     mask = 1. * np.random.randint(2, size=(self.n_vertices, self.n_vertices))
+        #     mask = np.tril(mask) + np.triu(mask.T, 1)
+        #     return mask
+        
+        # self.get_connection_mask = get_connection_mask
+
+    def get(self) -> np.ndarray:
+
+        g = nx.barabasi_albert_graph(self.n_vertices, self.m_insertion_edges)
+        # adj = np.multiply(nx.to_numpy_array(g), self.get_connection_mask())
+
+        # No self-connections (this modifies adj in-place).
+        # np.fill_diagonal(adj, 0)
+
+        return nx.to_numpy_array(g)
     
-    # read the adjacency matrix of the graph from a .csv file
-    def file2adj(path) -> np.ndarray:
-        adj = np.loadtxt(path, delimiter=',', dtype=int)
-        return adj
+class RegularGraph(GraphBase):
 
-    @abc.abstractmethod
-    def __repr__(self) -> str:
-        pass
+    def __init__(self, n_vertices=20, d_node=[2,0]):
+        super().__init__(n_vertices)
 
-    @abc.abstractmethod
-    def __str__(self) -> str:
-        pass
+        if type(d_node) not in [list,tuple]:
+            d_node = [d_node, 0]
+        assert len(d_node)==2, "k_neighbours must have length 2"
+        self.d_node  = d_node
 
-class SplitGraph(Graph):
+        # def get_connection_mask():
+        #     mask = 1. * np.random.randint(2, size=(self.n_vertices, self.n_vertices))
+        #     mask = np.tril(mask) + np.triu(mask.T, 1)
+        #     return mask
+        # self.get_connection_mask = get_connection_mask
 
-    def __init__(self, graph_type, num_vertices) -> None:
-        super().__init__(graph_type, num_vertices)
-        self._adj = self.graph2adj()
+    def get(self) -> np.ndarray:
+        k = np.clip(int(np.random.normal(*self.d_node)),0,self.n_vertices)
 
-    # split the graph into a clique and an independent set
-    def split2part(self) -> None:    
-        random_integer = random.randint(1, self.num_vertices-1)
-        self._clique = random_integer
-        self._independent_set = self.num_vertices - random_integer
-    
-    # return the adjacency matrix of the split graph
-    def graph2adj(self) -> np.ndarray:
-        self.split2part()
-        adj = [[0 for _ in range(self.num_vertices)] for _ in range(self.num_vertices)]
-        # vertices in the clique are connected
-        for i in range(self._clique):
-            for j in range(i+1, self._clique):
-                adj[i][j] = 1
-                adj[j][i] = 1
-        # vertices in the independent set are not connected
-        for i in range(self._clique, self.num_vertices):
-            for j in range(i+1, self.num_vertices):
-                adj[i][j] = 0
-                adj[j][i] = 0
-        # the edges between the clique and the independent set are randomly connected
-        # but each vertex in the independent set is at least connected to one vertex in the clique
-        for i in range(self._clique, self.num_vertices):
-            for j in range(self._clique):
-                adj[i][j] = random.randint(0, 1)
-                adj[j][i] = adj[i][j]
-            # if the vertex in the independent set is not connected to any vertex in the clique
-            # then it is connected to a random vertex in the clique
-            if sum(adj[i][:self._clique]) == 0:
-                j = random.randint(0, self._clique-1)
-                adj[i][j] = 1
-                adj[j][i] = 1
-            # if the vertex in the independent set is connected to all vertices in the clique
-            # then it is not connected to a random vertex in the clique
-            if self._clique != 1:
-                while sum(adj[i][:self._clique]) == self._clique:
-                    j = random.randint(0, self._clique-1)
-                    adj[i][j] = 0
-                    adj[j][i] = 0
-        return np.array(adj)
-    
-    def get_adj(self) -> np.ndarray:
-        return self._adj
-    
-    def get_clique(self) -> int:
-        return self._clique
-    
-    # return the maximum degree of the split graph
-    def get_max_degree(self) -> int:
-        return max([sum(self._adj[i]) for i in range(self.num_vertices)])
-    
-    def get_independent_set(self) -> int:  
-        return self._independent_set
-    
-    # save the adjacency matrix of the split graph to a .csv file
-    def save2file(self, path) -> None:
-        adj = self._adj
-        np.savetxt(path, adj, delimiter=',', fmt='%d')
+        g = nx.random_regular_graph(k, self.n_vertices)
+        # adj = np.multiply(nx.to_numpy_array(g), self.get_connection_mask())
 
-    def __repr__(self) -> str:
-        return (f'SplitGraph({self.graph_type}, {self.num_vertices})')
+        return nx.to_numpy_array(g)
     
-    def __str__(self) -> str:
-        return (f'SplitGraph({self.graph_type}, {self.num_vertices}): '
-                f'clique = {self._clique}, independent set = {self._independent_set}')
+class WattsStrogatzGraph(GraphBase):
 
+    def __init__(self, n_vertices=20, k_neighbours=[2,0]):
+        super().__init__(n_vertices)
+
+        if type(k_neighbours) not in [list,tuple]:
+            k_neighbours = [k_neighbours, 0]
+        assert len(k_neighbours)==2, "k_neighbours must have length 2"
+        self.k_neighbours  = k_neighbours
+
+        # def get_connection_mask():
+        #     mask = 1. * np.random.randint(2, size=(self.n_vertices, self.n_vertices))
+        #     mask = np.tril(mask) + np.triu(mask.T, 1)
+        #     return mask
+        # self.get_connection_mask = get_connection_mask
+
+    def get(self, with_padding=False):
+        k = np.clip(int(np.random.normal(*self.k_neighbours)),0,self.n_vertices)
+
+        g = nx.watts_strogatz_graph(self.n_vertices, k, 0)
+        # adj = np.multiply(nx.to_numpy_array(g), self.get_connection_mask())
+
+        return nx.to_numpy_array(g)
     
+class SplitGraph(GraphBase):
+    def __init__(self, n_vertices:int = 20, clique_size:int = 10, independent_set_size:int = 10, edge_probability: float = 0.5) -> None:
+        super().__init__(n_vertices)
+        
+        self.clique_size = clique_size
+        self.independent_set_size = independent_set_size
+        
+        if clique_size + independent_set_size != n_vertices:
+        #     raise ValueError("clique_size + independent_set_size must be equal to n_vertices")
+        # if clique_size < 0 or independent_set_size < 0:
+        #     raise ValueError("clique_size and independent_set_size must be non-negative")
+        # if clique_size is None or independent_set_size is None:
+            self.clique_size = randint(0, n_vertices)
+            self.independent_set_size = n_vertices - self.clique_size
+
+        self.edge_probability = edge_probability
+        
+    def get(self) -> np.ndarray:
+        G = nx.Graph()
+        
+        # add clique nodes
+        clique_nodes = range(self.clique_size)
+        G.add_nodes_from(clique_nodes)
+        
+        # add edges to the clique
+        for i in clique_nodes:
+            for j in clique_nodes:
+                if i < j:
+                    G.add_edge(i, j)
+        
+        # add independent set nodes
+        independent_nodes = range(self.clique_size, self.clique_size + self.independent_set_size)
+        G.add_nodes_from(independent_nodes)
+        
+        # add edges between clique and independent set by edge_probability
+        for i in clique_nodes:
+            for j in independent_nodes:
+                if np.random.rand() < self.edge_probability:
+                    G.add_edge(i, j)
+
+        return nx.to_numpy_array(G)

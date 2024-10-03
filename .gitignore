@@ -160,6 +160,7 @@ cython_debug/
 #.idea/
 
 # data files
+data/
 
 # .csv files
 *.csv
@@ -170,3 +171,7 @@ cython_debug/
 # .txt files except for requirements.txt
 *.txt
 !requirements.txt
+
+# test files
+tests/
+test/
