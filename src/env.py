@@ -1,12 +1,12 @@
-class Env:
-    _instance = None
+from src.solver import SolverFactory
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(Env, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
+envs = ['DSP', 'RDP', 'IRDP']
 
-    def __repr__(self):
-        attrs = vars(self)
-        attrs_str = ', '.join(f"{k}={v}" for k, v in attrs.items())
-        return f"Env({attrs_str})"
+def make(id, adj):
+    
+    if id in envs:
+        env = SolverFactory.get(id, adj)
+    else:
+        raise NotImplementedError()
+
+    return env

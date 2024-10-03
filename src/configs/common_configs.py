@@ -7,7 +7,7 @@ class PathConfig(ConfigBase):
     src = root / 'src'
     data = root / 'data'
     scripts = root / 'scripts'
-    tests = root / 'test'
+    tests = root / 'tests'
     logs = data / 'logs'
 
     def __post__init__(self) -> None:

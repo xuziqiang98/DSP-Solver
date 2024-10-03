@@ -1,4 +1,4 @@
-# Domination In Graphs
+# Domination Problem Solver
 
 Domination problem is a crucial question in graph theory.
 
@@ -18,16 +18,32 @@ python run.py --help
 Basic usage:
 
 ```
-python run.py -g 'split graph' -o 20 -n 50 -d 'independent Roman domination'
+python run.py --problem DSP --graph SPLIT --order 10
 ```
 
 Supported domination:
 
-* independent Roman domination
+* DSP
+    - Dominating Set Problem
+* RDP
+    - Roman Domination Problem
+    - Coming soon
+* IRDP
+    - Independent Roman Domination Problem
+    - Coming soon
 
 Supported graphs:
 
-* split graph
-
-
+* RAMDOM
+    - Ramdom Graph
+* SPLIT
+    - Split Graph
+* ER
+    - Erdos Renyi Graph
+* BA
+    - Barabasi Albert Graph
+* REGULAR
+    - Regular Graph
+* WS
+    - Watts Strogatz Graph
 
