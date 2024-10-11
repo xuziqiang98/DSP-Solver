@@ -20,9 +20,12 @@ def run(problem, graph, order):
     graph_adj = graph.get()
     env = make(problem, graph_adj)
     dominating_set, domination_number = env.solve()
+    if isinstance(dominating_set, list) and not any(isinstance(item, list) for item in dominating_set):
+        dominating_set = [dominating_set]
     print(f'[+] The problem {problem} has been solved in graph {graph}.')
     print(f'[+] The domination number is {domination_number}.')
-    print(f'[+] And the specific resulted set is {dominating_set}.')
+    for i in range(len(dominating_set)):
+        print(f'[+] And the specific resulted set assigned {i} is {dominating_set[i]}.')
     draw_graph = DrawGraph(graph_adj)
     draw_graph.draw()
 
