@@ -31,6 +31,8 @@ Supported domination:
 * IRDP
     - Independent Roman Domination Problem
     - Coming soon
+* RDRDP
+    - Restrained Double Roman Domination Problem
 
 Supported graphs:
 

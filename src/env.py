@@ -1,6 +1,6 @@
 from src.solver import SolverFactory
 
-envs = ['DSP', 'RDP', 'IRDP']
+envs = ['DSP', 'RDP', 'IRDP','RDRDP']
 
 def make(id, adj):
     

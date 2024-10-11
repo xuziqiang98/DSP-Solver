@@ -17,6 +17,8 @@ class OptimizationTarget(Enum):
     RDP = 2
     # Independent Roman Domination Problem
     IRDP = 3
+    # Restrained Double Roman Domination Problem
+    RDRDP = 4
 
 class GraphType(Enum):
     
