@@ -14,20 +14,26 @@ from random import randint
 class GraphFactory:
     
     def get(self, type, n_vertices: int, *args) -> 'GraphBase':
-        if type == GraphType.RANDOM:
-            return RandomGraph(n_vertices, *args)
-        elif type == GraphType.SPLIT:
-            return SplitGraph(n_vertices, *args)
-        elif type == GraphType.ER:
-            return ErdosRenyiGraph(n_vertices, *args)
-        elif type == GraphType.BA:
-            return BarabasiAlbertGraph(n_vertices, *args)
-        elif type == GraphType.REGULAR:
-            return RegularGraph(n_vertices, *args)
-        elif type == GraphType.WS:
-            return WattsStrogatzGraph(n_vertices, *args)
-        else:
-            raise NotImplementedError()
+        # if type == GraphType.RANDOM:
+        #     return RandomGraph(n_vertices, *args)
+        # elif type == GraphType.SPLIT:
+        #     return SplitGraph(n_vertices, *args)
+        # elif type == GraphType.ER:
+        #     return ErdosRenyiGraph(n_vertices, *args)
+        # elif type == GraphType.BA:
+        #     return BarabasiAlbertGraph(n_vertices, *args)
+        # elif type == GraphType.REGULAR:
+        #     return RegularGraph(n_vertices, *args)
+        # elif type == GraphType.WS:
+        #     return WattsStrogatzGraph(n_vertices, *args)
+        # else:
+        #     raise NotImplementedError()
+        class_name = type.name.capitalize() + 'Graph'
+        try:
+            GraphClass = globals()[class_name]
+            return GraphClass(n_vertices, *args)
+        except KeyError:
+            raise NotImplementedError(f'{class_name} is not implemented')
 
 class GraphBase(ABC):
 
@@ -222,4 +228,13 @@ class SplitGraph(GraphBase):
                 if np.random.rand() < self.edge_probability:
                     G.add_edge(i, j)
 
+        return nx.to_numpy_array(G)
+    
+class TreeGraph(GraphBase):
+    def __init__(self, n_vertices:int = 20) -> None:
+        super().__init__(n_vertices)
+        
+    def get(self) -> np.ndarray:
+        G = nx.random_tree(self.n_vertices)
+        
         return nx.to_numpy_array(G)
