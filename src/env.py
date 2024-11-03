@@ -1,10 +1,9 @@
 from src.solver import SolverFactory
-
-envs = ['DSP', 'RDP', 'IRDP','RDRDP']
+from src.utils import OptimizationTarget
 
 def make(id, adj):
     
-    if id in envs:
+    if id in OptimizationTarget.__members__:
         env = SolverFactory.get(id, adj)
     else:
         raise NotImplementedError()
