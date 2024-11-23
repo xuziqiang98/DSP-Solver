@@ -39,7 +39,7 @@ def run(problem, graph, order, cross_validation):
             _, gurobi_result = env.solve()
             validation = validation_factory.get(problem, graph_adj)
             _, valid_result = validation.solve()
-            if int(gurobi_result) == valid_result:
+            if int(gurobi_result) == int(valid_result):
                 print(f'[+] TIMESTEP {t}: The problem {problem} has been passed validation in graph {graph}.')
             else:
                 print(f'[-] TIMESTEP {t}: Something wrong happened in graph {graph}.')
