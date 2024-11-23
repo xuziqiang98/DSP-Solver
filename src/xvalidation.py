@@ -67,12 +67,12 @@ class RDRDPValidation(ValidationBase):
         self.dynamic_table = [[float('inf')] * self.n for _ in range(10)]
         for i in range(10):
             for j in range(self.n):
-                if i == 1:
-                    self.dynamic_table[i][j] = 1
-                elif i == 2:
+                if i == 2:
                     self.dynamic_table[i][j] = 2
                 elif i == 3:
                     self.dynamic_table[i][j] = 3
+                elif i == 4:
+                    self.dynamic_table[i][j] = 1
                 elif i == 8:
                     self.dynamic_table[i][j] = 0
         self.tree_order = postorder_traversal(self.adj)
@@ -129,8 +129,8 @@ class RDRDPValidation(ValidationBase):
                                            self.dynamic_table[7][k] + self.dynamic_table[5][j],
                                            self.dynamic_table[9][k] + self.dynamic_table[0][j],
                                            self.dynamic_table[9][k] + self.dynamic_table[5][j])
-            self.dynamic_table[8][k] = self.dynamic_table[8][k] + self.dynamic_table[1][j]
             self.dynamic_table[9][k] = min(self.dynamic_table[8][k] + self.dynamic_table[2][j],
                                            self.dynamic_table[9][k] + self.dynamic_table[1][j])
+            self.dynamic_table[8][k] = self.dynamic_table[8][k] + self.dynamic_table[1][j]
         return None, min(self.dynamic_table[0][self.root], self.dynamic_table[1][self.root],
                          self.dynamic_table[2][self.root], self.dynamic_table[3][self.root])
