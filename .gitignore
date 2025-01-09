@@ -180,5 +180,4 @@ data/
 tests/
 test/
 
-# Mac
 .DS_Store
