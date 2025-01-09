@@ -4,18 +4,27 @@ import scripts.path_setup
 from pathlib import Path
 from tqdm import tqdm
 from src.configs.common_configs import PathConfig
-from src.utils import GraphType
+from src.utils import GraphType, read_mtx
 from src.graph import GraphFactory
 from src.env import make
 from src.draw_graph import DrawGraph
 from src.xvalidation import validation_dict, ValidationFactory
+
+from src.test import GurobiSolver, SCIPSolver
+
+@click.group()
+def run():
+    pass
 
 @click.command()
 @click.option('--problem', required = True, type = str, help = 'a variant of domination problem')
 @click.option('--graph', required = True, type = str, help='special graph type')
 @click.option('--order', default = 10, type = int, help = 'graph order', show_default = True)
 @click.option('--cross_validation', is_flag = True, default = False, help = 'cross validation')
-def run(problem, graph, order, cross_validation):
+def auto_gen(problem, graph, order, cross_validation):
+    """
+    Automatic generation of graphs.
+    """
     ################################
     # Set up the environment       #
     ################################
@@ -58,6 +67,60 @@ def run(problem, graph, order, cross_validation):
     
         draw_graph = DrawGraph(graph_adj)
         draw_graph.draw()
+        
+@click.command()
+# @click.option('--problem', required = True, type = str, help = 'a variant of domination problem')
+@click.option('--mtx', required = True, type = str, help='mtx file path')
+@click.option('--solver', required = True, type = str, help = 'solver type')
+def manual_gen(mtx, solver):
+    """
+    Manual generation of graphs.
+    """
+    data_dir = PathConfig().data
+    
+    # Get all the mtx files in the data directory
+    dir_dict = {}
+    for file in data_dir.iterdir():
+        if file.is_dir():
+            dir_dict[file] = []
+            for mtx_file in file.iterdir():
+                if mtx_file.is_file() and mtx_file.suffix == '.mtx':
+                    dir_dict[file].append(mtx_file)
+    
+    if mtx.split('.')[-1] != 'mtx':
+        mtx += '.mtx'
+    
+    # 获取mtx文件所在的文件夹
+    mtx_dir = None
+    for dir, files in dir_dict.items():
+        for file in files:
+            if file.name == mtx:
+                mtx_dir = dir
+                break
+        if mtx_dir is not None:
+            break
+    
+    if mtx_dir is None:
+        raise FileNotFoundError(f'[-] {mtx} is not found in the data directory.')
+    
+    mtx_path = data_dir / mtx_dir / mtx
+    print(f'[+] The mtx file path is {mtx_path}.')
+    
+    graph = read_mtx(str(mtx_path))
+    # print(graph)
+    
+    if solver == 'gurobi':
+        model = GurobiSolver(graph)
+        model.solve()
+    elif solver == 'scip':
+        model = SCIPSolver(graph)
+        model.solve()
+    else:
+        raise NotImplementedError(f'[-] {solver} is not implemented.')
+
+# Add the commands to the group
+run.add_command(auto_gen)
+run.add_command(manual_gen)
 
 if __name__ == '__main__':
     run()
