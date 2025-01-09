@@ -55,3 +55,8 @@ class SCIPSolver():
         # 求解模型
         self.model.setParam("limits/time", 45)
         self.model.optimize()
+        ub = self.model.getPrimalbound()
+        lb = self.model.getDualbound()
+        # 用百分数表示gap
+        gap = (ub - lb) / ub * 100
+        return gap
