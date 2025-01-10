@@ -7,7 +7,8 @@ import numpy as np
 from types import MethodType, FunctionType
 from pathlib import Path
 from enum import Enum
-from scipy.io import mmread
+from scipy.io import mmread, mmwrite
+from scipy.sparse import csr_matrix
 
 
 class OptimizationTarget(Enum):
@@ -106,3 +107,17 @@ def read_mtx(file_path):
 # 获取指定文件夹下的所有文件
 def get_files(path: str) -> list[str]:
     return [str(file) for file in Path(path).iterdir()]
+
+def save_mtx(file_path: str, adj_matrix: np.ndarray):
+    """
+    将邻接矩阵保存为 .mtx 文件。
+
+    :param file_path: str, 保存路径
+    :param adj_matrix: np.ndarray, 邻接矩阵
+    """
+    # 将邻接矩阵转换为稀疏矩阵
+    sparse_matrix = csr_matrix(adj_matrix)
+    
+    # 保存为 .mtx 文件
+    mmwrite(file_path, sparse_matrix)
+    
