@@ -177,8 +177,8 @@ data/
 !requirements.txt
 
 # test files
-tests/
-test/
+# tests/
+# test/
 
 # Mac
 .DS_Store
