@@ -114,9 +114,9 @@ def manual_gen(mtx, solver):
         model.solve()
     elif solver == 'scip':
         model = SCIPSolver(graph)
-        gap = model.solve()
+        model.solve()
         
-        print(f'[+] The gap is {gap:.2f}%')
+        # print(f'[+] The gap is {gap:.2f}%')
     else:
         raise NotImplementedError(f'[-] {solver} is not implemented.')
 

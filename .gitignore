@@ -177,7 +177,7 @@ data/
 !requirements.txt
 
 # test files
-tests/
-test/
+# tests/
+# test/
 
 .DS_Store
