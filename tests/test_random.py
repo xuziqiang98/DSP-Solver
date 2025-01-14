@@ -2,7 +2,7 @@ import path_setup
 import numpy as np
 
 from src.utils import GraphType, save_mtx
-from src.graph import GraphFactory
+from src.graph import GraphFactory, RandomDenseGraph
 from src.test import GurobiSolver, SCIPSolver
 from src.env import make
 from src.configs.common_configs import PathConfig
@@ -31,7 +31,7 @@ counter1000 = 1
 counter1100 = 1
 
 for _ in range(50):
-    order = np.random.randint(700, 1100)
+    order = np.random.randint(160, 240)
     graph = graph_factory.get(graph_type, order)
     matrix = graph.get()
     data_dir = PathConfig().data / 'RANDOM'

@@ -10,7 +10,8 @@ from src.env import make
 from src.draw_graph import DrawGraph
 from src.xvalidation import validation_dict, ValidationFactory
 
-from src.test import GurobiSolver, SCIPSolver
+# from src.test import GurobiSolver, SCIPSolver
+from src.clique import GurobiSolver, SCIPSolver
 
 @click.group()
 def run():
@@ -110,11 +111,13 @@ def manual_gen(mtx, solver):
     # print(graph)
     
     if solver == 'gurobi':
-        model = GurobiSolver(graph)
-        model.solve()
+        # model = GurobiSolver(graph)
+        # model.solve()
+        GurobiSolver(graph)
     elif solver == 'scip':
-        model = SCIPSolver(graph)
-        model.solve()
+        # model = SCIPSolver(graph)
+        # model.solve()
+        SCIPSolver(graph)
         
         # print(f'[+] The gap is {gap:.2f}%')
     else:
