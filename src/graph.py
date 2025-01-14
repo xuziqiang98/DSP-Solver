@@ -238,3 +238,33 @@ class TreeGraph(GraphBase):
         G = nx.random_tree(self.n_vertices)
         
         return nx.to_numpy_array(G)
+
+# 顶点带权重的随机图
+class RandomWeightedGraph(GraphBase):
+    def __init__(self, n_vertices:int = 20) -> None:
+        super().__init__(n_vertices)
+        
+    def get(self) -> np.ndarray:
+        G = nx.Graph()
+        for i in range(self.n_vertices):
+            G.add_node(i)
+        for i in range(self.n_vertices):
+            for j in range(i + 1, self.n_vertices):
+                G.add_edge(i, j, weight=randint(1, 10))
+        
+        return nx.to_numpy_array(G)
+
+# 生成随机的无权稠密图
+class RandomDenseGraph(GraphBase):
+    """
+    n_vertices: 顶点数
+    density: 图的密度
+    """
+    def __init__(self, n_vertices:int = 20, density:float = 0.6) -> None:
+        super().__init__(n_vertices)
+        self.density = density
+        
+    def get(self) -> np.ndarray:
+        G = nx.dense_gnm_random_graph(self.n_vertices, ceil(self.n_vertices * (self.n_vertices - 1) * self.density / 2))
+        
+        return nx.to_numpy_array(G)
