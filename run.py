@@ -63,8 +63,13 @@ def auto_gen(problem, graph, order, cross_validation):
             dominating_set = [dominating_set]
         print(f'[+] The problem {problem} has been solved in graph {graph}.')
         print(f'[+] The domination number is {domination_number}.')
-        for i in range(len(dominating_set)):
-            print(f'[+] And the specific resulted set assigned {i+1} is {dominating_set[i]}.')
+        if problem == 'MkD':
+            print(f'[+] And the specific resulted set assigned 1 is {dominating_set[0]}.')
+            print(f'[+] And the specific resulted set assigned 0 is {dominating_set[1]}.')
+            print(f'[+] And the specific resulted set assigned -1 is {dominating_set[2]}.')
+        else:
+            for i in range(len(dominating_set)):
+                print(f'[+] And the specific resulted set assigned {i+1} is {dominating_set[i]}.')
     
         draw_graph = DrawGraph(graph_adj)
         draw_graph.draw()

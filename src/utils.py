@@ -23,6 +23,8 @@ class OptimizationTarget(Enum):
     RDRDP = 4
     # restrained Domination Problem
     rDP = 5
+    # Minus k-Dominating Set Problem
+    MkD = 6
 
 class GraphType(Enum):
     
