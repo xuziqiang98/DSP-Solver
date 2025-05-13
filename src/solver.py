@@ -176,6 +176,7 @@ class MkDSolver(SolverBase):
     
     def solve(self):
         # 求解模型
+        self.model.setParam('TimeLimit', 45)
         self.model.optimize()
 
         # 检查约束条件是否满足
