@@ -67,6 +67,8 @@ def auto_gen(problem, graph, order, cross_validation):
             print(f'[+] And the specific resulted set assigned 1 is {dominating_set[0]}.')
             print(f'[+] And the specific resulted set assigned 0 is {dominating_set[1]}.')
             print(f'[+] And the specific resulted set assigned -1 is {dominating_set[2]}.')
+            print(f'[+] The network has {len(dominating_set[2])} vulnerable nodes.')
+            print(f'[+] The network needs to be deployed {len(dominating_set[0])} IDS.')
         else:
             for i in range(len(dominating_set)):
                 print(f'[+] And the specific resulted set assigned {i+1} is {dominating_set[i]}.')
@@ -75,10 +77,10 @@ def auto_gen(problem, graph, order, cross_validation):
         draw_graph.draw()
         
 @click.command()
-# @click.option('--problem', required = True, type = str, help = 'a variant of domination problem')
+@click.option('--problem', required = True, type = str, help = 'a variant of domination problem')
 @click.option('--mtx', required = True, type = str, help='mtx file path')
-@click.option('--solver', required = True, type = str, help = 'solver type')
-def manual_gen(mtx, solver):
+# @click.option('--solver', required = True, type = str, help = 'solver type')
+def manual_gen(problem, mtx):
     """
     Manual generation of graphs.
     """
@@ -115,18 +117,38 @@ def manual_gen(mtx, solver):
     graph = read_mtx(str(mtx_path))
     # print(graph)
     
-    if solver == 'gurobi':
-        # model = GurobiSolver(graph)
-        # model.solve()
-        GurobiSolver(graph)
-    elif solver == 'scip':
-        # model = SCIPSolver(graph)
-        # model.solve()
-        SCIPSolver(graph)
-        
-        # print(f'[+] The gap is {gap:.2f}%')
+    env = make(problem, graph)
+    
+    dominating_set, domination_number = env.solve()
+    # if isinstance(dominating_set, list) and not any(isinstance(item, list) for item in dominating_set):
+    if not isinstance(dominating_set[0], list):
+        dominating_set = [dominating_set]
+    print(f'[+] The problem {problem} has been solved in graph {graph}.')
+    print(f'[+] The domination number is {domination_number}.')
+    if problem == 'MkD':
+        print(f'[+] And the specific resulted set assigned 1 is {dominating_set[0]}.')
+        print(f'[+] And the specific resulted set assigned 0 is {dominating_set[1]}.')
+        print(f'[+] And the specific resulted set assigned -1 is {dominating_set[2]}.')
+        print(f'[+] The network has {len(dominating_set[2])} vulnerable nodes.')
+        print(f'[+] The network needs to be deployed {len(dominating_set[0])} IDS.')
     else:
-        raise NotImplementedError(f'[-] {solver} is not implemented.')
+        for i in range(len(dominating_set)):
+            print(f'[+] And the specific resulted set assigned {i+1} is {dominating_set[i]}.')
+    
+    
+    # temp testing
+    # if solver == 'gurobi':
+    #     # model = GurobiSolver(graph)
+    #     # model.solve()
+    #     GurobiSolver(graph)
+    # elif solver == 'scip':
+    #     # model = SCIPSolver(graph)
+    #     # model.solve()
+    #     SCIPSolver(graph)
+        
+    #     # print(f'[+] The gap is {gap:.2f}%')
+    # else:
+    #     raise NotImplementedError(f'[-] {solver} is not implemented.')
 
 # Add the commands to the group
 run.add_command(auto_gen)
